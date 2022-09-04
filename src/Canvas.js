@@ -3,7 +3,8 @@ const Cube = require('cubejs');
 
 
 
-const SIZE = 20;
+const GRIDSIZE = 20;
+const GAP = 5;
 
 const colors = {
   U: '#FFFFFF',
@@ -27,12 +28,12 @@ const Canvas = props => {
     
   useEffect(() => {
     const draw = ctx => {
-      drawSquare(ctx, cubeString, 3*SIZE, 0);
-      drawSquare(ctx, cubeString.slice(9), 6*SIZE, 3*SIZE);
-      drawSquare(ctx, cubeString.slice(18), 3*SIZE, 3*SIZE);
-      drawSquare(ctx, cubeString.slice(27), 3*SIZE, 6*SIZE);
-      drawSquare(ctx, cubeString.slice(36), 0*SIZE, 3*SIZE);
-      drawSquare(ctx, cubeString.slice(45), 9*SIZE, 3*SIZE);
+      drawSquare(ctx, cubeString, 3*GRIDSIZE + 1*GAP, 0);
+      drawSquare(ctx, cubeString.slice(9), 6*GRIDSIZE + 2*GAP, 3*GRIDSIZE + 1*GAP);
+      drawSquare(ctx, cubeString.slice(18), 3*GRIDSIZE + 1*GAP, 3*GRIDSIZE + 1*GAP);
+      drawSquare(ctx, cubeString.slice(27), 3*GRIDSIZE + 1*GAP, 6*GRIDSIZE + 2*GAP);
+      drawSquare(ctx, cubeString.slice(36), 0*GRIDSIZE, 3*GRIDSIZE + 1*GAP);
+      drawSquare(ctx, cubeString.slice(45), 9*GRIDSIZE + 3*GAP, 3*GRIDSIZE + 1*GAP);
     }
 
     const canvas = canvasRef.current
@@ -51,8 +52,8 @@ const drawSquare =  (ctx, square, x, y) => {
   ctx.strokeStyle = "#000000";
   for (let i = 0; i < 9; i ++) {
     ctx.fillStyle = colors[square[i]];
-    ctx.fillRect(x + positions[i][0] * SIZE, y + positions[i][1] * SIZE, SIZE, SIZE);
-    ctx.strokeRect(x + positions[i][0] * SIZE, y + positions[i][1] * SIZE, SIZE, SIZE);
+    ctx.fillRect(x + positions[i][0] * GRIDSIZE, y + positions[i][1] * GRIDSIZE, GRIDSIZE, GRIDSIZE);
+    ctx.strokeRect(x + positions[i][0] * GRIDSIZE, y + positions[i][1] * GRIDSIZE, GRIDSIZE, GRIDSIZE);
   }
 
 }
