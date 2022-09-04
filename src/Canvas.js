@@ -16,6 +16,13 @@ const colors = {
 }
 
 const Canvas = props => {
+  const {width, height} = props;
+
+  const totalWidth = 12*GRIDSIZE + 3*GAP;
+  const totalHeight = 9*GRIDSIZE + 2*GAP;
+  const marginLeft = (width - totalWidth)/2;
+  const marginTop = (height - totalHeight)/2;
+
   const { currentScramble } = props;
   const cube = new Cube();
   cube.move(currentScramble);
@@ -28,12 +35,15 @@ const Canvas = props => {
     
   useEffect(() => {
     const draw = ctx => {
-      drawSquare(ctx, cubeString, 3*GRIDSIZE + 1*GAP, 0);
-      drawSquare(ctx, cubeString.slice(9), 6*GRIDSIZE + 2*GAP, 3*GRIDSIZE + 1*GAP);
-      drawSquare(ctx, cubeString.slice(18), 3*GRIDSIZE + 1*GAP, 3*GRIDSIZE + 1*GAP);
-      drawSquare(ctx, cubeString.slice(27), 3*GRIDSIZE + 1*GAP, 6*GRIDSIZE + 2*GAP);
-      drawSquare(ctx, cubeString.slice(36), 0*GRIDSIZE, 3*GRIDSIZE + 1*GAP);
-      drawSquare(ctx, cubeString.slice(45), 9*GRIDSIZE + 3*GAP, 3*GRIDSIZE + 1*GAP);
+      ctx.fillStyle = '#fdd';
+      ctx.fillRect(0, 0, width, height);
+
+      drawSquare(ctx, cubeString, 3*GRIDSIZE + 1*GAP + marginLeft, marginTop);
+      drawSquare(ctx, cubeString.slice(9), 6*GRIDSIZE + 2*GAP + marginLeft, 3*GRIDSIZE + 1*GAP + marginTop);
+      drawSquare(ctx, cubeString.slice(18), 3*GRIDSIZE + 1*GAP + marginLeft, 3*GRIDSIZE + 1*GAP + marginTop);
+      drawSquare(ctx, cubeString.slice(27), 3*GRIDSIZE + 1*GAP + marginLeft, 6*GRIDSIZE + 2*GAP + marginTop);
+      drawSquare(ctx, cubeString.slice(36), 0*GRIDSIZE + marginLeft, 3*GRIDSIZE + 1*GAP + marginTop);
+      drawSquare(ctx, cubeString.slice(45), 9*GRIDSIZE + 3*GAP + marginLeft, 3*GRIDSIZE + 1*GAP + marginTop);
     }
 
     const canvas = canvasRef.current

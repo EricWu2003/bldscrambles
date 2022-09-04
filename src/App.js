@@ -26,7 +26,7 @@ const App = () => {
           <Canvas 
             currentScramble={currentScramble} 
             width={300}
-            height={300}
+            height={220}
           />
         </Container>
       </main>
