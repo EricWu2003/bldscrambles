@@ -9,18 +9,63 @@ const CubeInfoDisplay = ({currentScramble}) => {
   const cubeJSON = cube.toJSON()
   console.log(cubeJSON);
 
-  console.log(calculateEdgeCycles({
+  const edgeCycles = calculateEdgeCycles({
     cubeJSON, 
     buffer: 5,
-  }));
+  });
 
   return (
     <Box>
       <Typography>
-        {currentScramble}
+        {edgeCycles}
       </Typography>
     </Box>
   );
+}
+
+
+const EDGE_LOCATIONS = [
+  ["UR", "RU"],
+  ["UF", "FU"],
+  ["UL", "LU"],
+  ["UB", "BU"],
+  ["DR", "RD"],
+  ["DF", "FD"],
+  ["DL", "LD"],
+  ["DB", "BD"],
+  ["FR", "RF"],
+  ["FL", "LF"],
+  ["BL", "LB"],
+  ["BR", "RB"],
+]
+
+const SPIFFS = {
+  EDGES: {
+    "UR": 'B',
+    "RU": 'M',
+    "UF": 'C',
+    "FU": 'I',
+    "UL": 'D',
+    "LU": 'E',
+    "UB": 'A',
+    "BU": 'Q',
+    "DR": 'V',
+    "RD": 'O',
+    "DF": 'U',
+    "FD": 'K',
+    "DL": 'X',
+    "LD": 'G',
+    "DB": 'W',
+    "BD": 'S',
+    "FR": 'J',
+    "RF": 'P',
+    "FL": 'L',
+    "LF": 'F',
+    "BR": 'T',
+    "RB": 'N',
+    "BL": 'R',
+    "LB": 'H',
+  },
 }
 
 
@@ -53,7 +98,7 @@ const calculateEdgeCycles = ({cubeJSON, buffer}) => {
       // begin new cycle. First we find the first location that is not solved
       let breakInPoint = hasTouched.findIndex(elem => elem === false);
       if (breakInPoint === -1) {
-        return cycles;
+        break;
       } else {
         currentBufferLocation = breakInPoint;
         cycles.push([breakInPoint, 0]);
@@ -73,6 +118,13 @@ const calculateEdgeCycles = ({cubeJSON, buffer}) => {
       hasTouched[currIndex] = true;
     }
   }
+
+  return cycles.map(arr => {
+    
+    const [location, orientation] = arr;
+    const code = EDGE_LOCATIONS[location][orientation];
+    return SPIFFS.EDGES[code];
+  })
 }
 
 export default CubeInfoDisplay;
