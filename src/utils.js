@@ -5,8 +5,6 @@ export function getRndInteger(min, max) {
 }
 
 export function generateRandomScramble() {
-  Cube.initSolver();
-  
+  console.log('generating a random scramble...')
   return Cube.scramble();
-
 }

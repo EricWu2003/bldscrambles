@@ -5,6 +5,7 @@ import Header from './Header';
 import { generateRandomScramble } from './utils';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CubeInfoDisplay from './CubeInfoDisplay';
+import Cube from 'cubejs';
 
 
 
@@ -17,7 +18,10 @@ const themeLight = createTheme({
 });
 
 const App = () => {
-  const [currentScramble, setCurrentScramble] = React.useState(generateRandomScramble());
+  // This line must come before any call of the generateRandomScramble function.
+  Cube.initSolver();
+
+  const [currentScramble, setCurrentScramble] = React.useState(generateRandomScramble);
 
 
   return (
@@ -26,7 +30,7 @@ const App = () => {
         <CssBaseline></CssBaseline>
         <header className="App-header">
           <Header 
-            currentScramble={currentScramble}
+            currentScramble={currentScramble || ""}
             setCurrentScramble={setCurrentScramble}
           />
         </header>
@@ -34,11 +38,11 @@ const App = () => {
         <main>
           <Container maxWidth="md">
             <Canvas 
-              currentScramble={currentScramble} 
+              currentScramble={currentScramble || ""} 
               width={300}
               height={220}
             />
-            <CubeInfoDisplay currentScramble={currentScramble} />
+            <CubeInfoDisplay currentScramble={currentScramble || ""} />
           </Container>
         </main>
       </div>
