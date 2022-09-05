@@ -1,5 +1,5 @@
 import React, {useRef, useEffect} from 'react'
-const Cube = require('cubejs');
+import Cube from 'cubejs';
 
 
 
@@ -16,12 +16,8 @@ const colors = {
 }
 
 const Canvas = props => {
-  const {width, height} = props;
 
-  const totalWidth = 12*GRIDSIZE + 3*GAP;
-  const totalHeight = 9*GRIDSIZE + 2*GAP;
-  const marginLeft = (width - totalWidth)/2;
-  const marginTop = (height - totalHeight)/2;
+  
 
   const { currentScramble } = props;
   const cube = new Cube();
@@ -35,6 +31,13 @@ const Canvas = props => {
     
   useEffect(() => {
     const draw = ctx => {
+      const {width, height} = props;
+      const totalWidth = 12*GRIDSIZE + 3*GAP;
+      const totalHeight = 9*GRIDSIZE + 2*GAP;
+      const marginLeft = (width - totalWidth)/2;
+      const marginTop = (height - totalHeight)/2;
+
+
       ctx.fillStyle = '#fdd';
       ctx.fillRect(0, 0, width, height);
 
@@ -51,7 +54,7 @@ const Canvas = props => {
     
     //Our draw come here
     draw(context)
-  }, [canvasRef, cubeString])
+  }, [canvasRef, cubeString, props])
   
   return <canvas ref={canvasRef} {...props}/>
 }

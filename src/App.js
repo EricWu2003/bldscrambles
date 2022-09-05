@@ -4,6 +4,7 @@ import { CssBaseline, Container } from '@mui/material';
 import Header from './Header';
 import { generateRandomScramble } from './utils';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CubeInfoDisplay from './CubeInfoDisplay';
 
 
 
@@ -37,6 +38,7 @@ const App = () => {
               width={300}
               height={220}
             />
+            <CubeInfoDisplay currentScramble={currentScramble} />
           </Container>
         </main>
       </div>
