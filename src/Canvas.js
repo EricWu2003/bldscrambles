@@ -56,7 +56,7 @@ const Canvas = props => {
     draw(context)
   }, [canvasRef, cubeString, props])
   
-  return <canvas ref={canvasRef} {...props}/>
+  return <canvas ref={canvasRef} width={props.width} height={props.height}/>
 }
 
 const drawSquare =  (ctx, square, x, y) => {

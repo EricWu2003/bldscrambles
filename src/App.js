@@ -23,7 +23,6 @@ const App = () => {
 
   const [currentScramble, setCurrentScramble] = React.useState(generateRandomScramble);
 
-
   return (
     <ThemeProvider theme={themeLight}>
       <div className="App">
