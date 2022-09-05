@@ -10,7 +10,7 @@ const CubeInfoDisplay = ({currentScramble}) => {
   console.log(cubeJSON);
 
   console.log(calculateEdgeCycles({
-    ep: cubeJSON.ep, 
+    cubeJSON, 
     buffer: 5,
   }));
 
@@ -24,8 +24,9 @@ const CubeInfoDisplay = ({currentScramble}) => {
 }
 
 
-const calculateEdgeCycles = ({ep, buffer}) => {
-  debugger;
+const calculateEdgeCycles = ({cubeJSON, buffer}) => {
+  const {ep, eo} = cubeJSON;
+
   let currentBufferLocation = ep.findIndex(x => x === buffer);
 
   let hasTouched = ep.map((elem, index) => elem === index);
@@ -34,15 +35,17 @@ const calculateEdgeCycles = ({ep, buffer}) => {
   let cycles = [];
 
 
-  let currIndex;
+  let currIndex, currOrientation;
   if (ep[buffer] !== buffer) {
     // If the buffer position is not occupied by the buffer piece
     currIndex = ep[buffer];
+    currOrientation = eo[buffer];
   } else {
     // If the buffer position is occupied by the buffer piece
     currIndex = hasTouched.findIndex(elem => elem === false);
+    currOrientation = 0;
   }
-  cycles.push(currIndex);
+  cycles.push([currIndex, currOrientation]);
   hasTouched[currIndex] = true;
 
   while (true) {
@@ -53,20 +56,21 @@ const calculateEdgeCycles = ({ep, buffer}) => {
         return cycles;
       } else {
         currentBufferLocation = breakInPoint;
-        cycles.push(breakInPoint);
+        cycles.push([breakInPoint, 0]);
         hasTouched[breakInPoint] = true;
+
+        currOrientation = eo[breakInPoint];
         currIndex = ep[breakInPoint];
-        cycles.push(currIndex);
+        cycles.push([currIndex, currOrientation]);
         hasTouched[currIndex] = true;
       }
 
-
     } else {
       // follow next edge in cycle
-      let next = ep[currIndex];
-      cycles.push(next);
-      hasTouched[next] = true;
-      currIndex = next;
+      currOrientation = (currOrientation + eo[currIndex]) % 2;
+      currIndex = ep[currIndex];
+      cycles.push([currIndex, currOrientation]);
+      hasTouched[currIndex] = true;
     }
   }
 }
