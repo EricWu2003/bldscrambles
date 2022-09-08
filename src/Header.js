@@ -16,7 +16,6 @@ const Header = ({currentScramble, setCurrentScramble}) => {
   const isValidScramble = scramble => {
     const tokens = scramble.split(' ');
     const validTokens = ["R", "R'", "R2", "L", "L'", "L2", "U", "U'", "U2", "D", "D'", "D2", "F", "F'", "F2", "B", "B'", "B2"];
-    console.log(tokens);
     let invalid = false;
     tokens.forEach(token => {
       if (!validTokens.includes(token)) {

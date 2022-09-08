@@ -7,7 +7,6 @@ const CubeInfoDisplay = ({currentScramble}) => {
   cube.move(currentScramble);
 
   const cubeJSON = cube.toJSON()
-  console.log(cubeJSON);
 
   const edgeCycles = calculateEdgeCycles({
     cubeJSON, 
@@ -70,6 +69,7 @@ const SPIFFS = {
 
 
 const calculateEdgeCycles = ({cubeJSON, buffer}) => {
+  debugger;
   const {ep, eo} = cubeJSON;
 
   let currentBufferLocation = ep.findIndex(x => x === buffer);
@@ -85,13 +85,21 @@ const calculateEdgeCycles = ({cubeJSON, buffer}) => {
     // If the buffer position is not occupied by the buffer piece
     currIndex = ep[buffer];
     currOrientation = eo[buffer];
+    cycles.push([currIndex, currOrientation]);
+    hasTouched[currIndex] = true;
   } else {
     // If the buffer position is occupied by the buffer piece
     currIndex = hasTouched.findIndex(elem => elem === false);
     currOrientation = 0;
+    currentBufferLocation = currIndex;
+    cycles.push([currIndex, currOrientation]);
+    hasTouched[currIndex] = true;
+
+    currOrientation = eo[currIndex];
+    currIndex = ep[currIndex];
+    cycles.push([currIndex, currOrientation]);
+    hasTouched[currIndex] = true;
   }
-  cycles.push([currIndex, currOrientation]);
-  hasTouched[currIndex] = true;
 
   while (true) {
     if (currIndex === currentBufferLocation) {
