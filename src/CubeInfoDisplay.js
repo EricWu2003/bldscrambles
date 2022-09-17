@@ -7,7 +7,6 @@ const CubeInfoDisplay = ({currentScramble}) => {
   cube.move(currentScramble);
 
   const cubeJSON = cube.toJSON()
-  console.log(cubeJSON);
 
   const edgeCycles = calculateEdgeCycles({
     cubeJSON, 
@@ -24,10 +23,10 @@ const CubeInfoDisplay = ({currentScramble}) => {
   return (
     <Box>
       <Typography>
-        Edges: {edgeCycles}
+        Edges: {displayAsPairs(edgeCycles)}
       </Typography>
       <Typography>
-        Corners: {cornerCycles}
+        Corners: {displayAsPairs(cornerCycles)}
       </Typography>
     </Box>
   );
@@ -260,8 +259,6 @@ const calculateCornerCycles = ({cubeJSON, buffer}) => {
     const [location, orientation] = arr;
     return [location, (3+orientation)%3];
   })
-  
-  console.log("cycles: ", cycles);
 
   return cycles.map(arr => {
     const [location, orientation] = arr;
@@ -273,4 +270,12 @@ const calculateCornerCycles = ({cubeJSON, buffer}) => {
 export default CubeInfoDisplay;
 
 
-// D2 F2 R2 U L2 R2 D2 B2 D' F2 U' L2 U2 B L U' L' D' R D2 R' U2
+const displayAsPairs = letterArray => {
+  let letterString = letterArray.join('');
+  let pairs = [];
+  while (letterString !== '') {
+    pairs.push(letterString.slice(0,2));
+    letterString = letterString.slice(2);
+  }
+  return pairs.join(' ');
+}
