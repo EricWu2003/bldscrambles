@@ -7,16 +7,27 @@ const CubeInfoDisplay = ({currentScramble}) => {
   cube.move(currentScramble);
 
   const cubeJSON = cube.toJSON()
+  console.log(cubeJSON);
 
   const edgeCycles = calculateEdgeCycles({
     cubeJSON, 
     buffer: 5,
   });
 
+  const cornerCycles = calculateCornerCycles({
+    cubeJSON, 
+    buffer: 2,
+  });
+
+
+
   return (
     <Box>
       <Typography>
-        {edgeCycles}
+        Edges: {edgeCycles}
+      </Typography>
+      <Typography>
+        Corners: {cornerCycles}
       </Typography>
     </Box>
   );
@@ -36,6 +47,17 @@ const EDGE_LOCATIONS = [
   ["FL", "LF"],
   ["BL", "LB"],
   ["BR", "RB"],
+]
+
+const CORNER_LOCATIONS = [
+  ["UFR", "RUF", "FUR"],
+  ["UFL", "FUL", "LUF"],
+  ["UBL", "LUB", "BUL"],
+  ["UBR", "BUR", "RUB"],
+  ["DFR", "FDR", "RDF"],
+  ["DFL", "LDF", "FDL"],
+  ["DBL", "BDL", "LDB"],
+  ["DBR", "RDB", "BDR"],
 ]
 
 const SPIFFS = {
@@ -65,11 +87,37 @@ const SPIFFS = {
     "BL": 'R',
     "LB": 'H',
   },
+  CORNERS: {
+    "UBL": 'A',
+    "UBR": 'B',
+    "UFR": 'C',
+    "UFL": 'D',
+    "LUB": 'E',
+    "LUF": 'F',
+    "LDF": 'G',
+    "LDB": 'H',
+    "FUL": 'I',
+    "FUR": 'J',
+    "FDR": 'K',
+    "FDL": 'L',
+    "RUF": 'M',
+    "RUB": 'N',
+    "RDB": 'O',
+    "RDF": 'P',
+    "BUR": 'Q',
+    "BUL": 'R',
+    "BDL": 'S',
+    "BDR": 'T',
+    "DFL": 'U',
+    "DFR": 'V',
+    "DBR": 'W',
+    "DBL": 'X',
+  }
+
 }
 
 
 const calculateEdgeCycles = ({cubeJSON, buffer}) => {
-  debugger;
   const {ep, eo} = cubeJSON;
 
   let currentBufferLocation = ep.findIndex(x => x === buffer);
@@ -86,6 +134,7 @@ const calculateEdgeCycles = ({cubeJSON, buffer}) => {
   let cycles = [];
 
 
+  // TODO: right now the fact that U is the buffer (not K) is implicitly defined in the code. Make this explicit
   let currIndex, currOrientation;
   if (ep[buffer] !== buffer) {
     // If the buffer position is not occupied by the buffer piece
@@ -140,4 +189,88 @@ const calculateEdgeCycles = ({cubeJSON, buffer}) => {
   })
 }
 
+
+const calculateCornerCycles = ({cubeJSON, buffer}) => {
+  const {cp, co} = cubeJSON;
+
+  let currentBufferLocation = cp.findIndex(x => x === buffer);
+
+  let hasTouched = cp.map((elem, index) => elem === index);
+  hasTouched[buffer] = true;
+
+  const allEdgesAreSolved = !hasTouched.some(val => !val);
+  if (allEdgesAreSolved) {
+    return "";
+  }
+
+  
+  let cycles = [];
+
+
+  // TODO: right now the fact that A is the buffer (not E or R) is implicitly defined in the code. Make this explicit
+  let currIndex, currOrientation;
+  if (cp[buffer] !== buffer) {
+    // If the buffer position is not occupied by the buffer piece
+    currIndex = cp[buffer];
+    currOrientation = co[buffer];
+    cycles.push([currIndex, -currOrientation]);
+    hasTouched[currIndex] = true;
+  } else {
+    // If the buffer position is occupied by the buffer piece
+    currIndex = hasTouched.findIndex(elem => elem === false);
+    currOrientation = 0;
+    currentBufferLocation = currIndex;
+    cycles.push([currIndex, -currOrientation]);
+    hasTouched[currIndex] = true;
+
+    currOrientation = co[currIndex];
+    currIndex = cp[currIndex];
+    cycles.push([currIndex, -currOrientation]);
+    hasTouched[currIndex] = true;
+  }
+
+  while (true) {
+    if (currIndex === currentBufferLocation) {
+      // begin new cycle. First we find the first location that is not solved
+      let breakInPoint = hasTouched.findIndex(elem => elem === false);
+      if (breakInPoint === -1) {
+        break;
+      } else {
+        currentBufferLocation = breakInPoint;
+        cycles.push([breakInPoint, 0]);
+        hasTouched[breakInPoint] = true;
+
+        currOrientation = co[breakInPoint];
+        currIndex = cp[breakInPoint];
+        cycles.push([currIndex, -currOrientation]);
+        hasTouched[currIndex] = true;
+      }
+
+    } else {
+      // follow next edge in cycle
+      currOrientation = (currOrientation + co[currIndex]) % 3;
+      currIndex = cp[currIndex];
+      cycles.push([currIndex, -currOrientation]);
+      hasTouched[currIndex] = true;
+    }
+  }
+
+  
+  cycles = cycles.map(arr => {
+    const [location, orientation] = arr;
+    return [location, (3+orientation)%3];
+  })
+  
+  console.log("cycles: ", cycles);
+
+  return cycles.map(arr => {
+    const [location, orientation] = arr;
+    const code = CORNER_LOCATIONS[location][orientation];
+    return SPIFFS.CORNERS[code];
+  })
+}
+
 export default CubeInfoDisplay;
+
+
+// D2 F2 R2 U L2 R2 D2 B2 D' F2 U' L2 U2 B L U' L' D' R D2 R' U2
