@@ -5,6 +5,8 @@ import { generateRandomScramble } from './utils';
 
 const Header = ({currentScramble, setCurrentScramble}) => {
 
+  const [editingScramble, setEditingScramble] = React.useState(currentScramble);
+
   const [isEditMode, setIsEditMode] = React.useState(false);
   const [isError, setIsError] = React.useState(false);
 
@@ -14,37 +16,35 @@ const Header = ({currentScramble, setCurrentScramble}) => {
   };
 
   const isValidScramble = scramble => {
-    const tokens = scramble.split(' ');
-    const validTokens = ["R", "R'", "R2", "L", "L'", "L2", "U", "U'", "U2", "D", "D'", "D2", "F", "F'", "F2", "B", "B'", "B2"];
-    let invalid = false;
-    tokens.forEach(token => {
-      if (!validTokens.includes(token)) {
-        invalid = true;
-      }
-    });
-    return !invalid;
+    try {
+      convertScrambleToStandardForm(scramble);
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 
   const handleTextFieldChange = e => {
     const inputValue = e.target.value;
+    setEditingScramble(inputValue.replace("\n", ""));
 
-    
-  
+    const isError = !isValidScramble(inputValue);
+    setIsError(isError);
 
-
-    if (inputValue.includes('\n')) {
-      const processedScramble = inputValue.replaceAll('\n', '')
-      const isValid = isValidScramble(processedScramble);
-      if (isValid) {
-        setCurrentScramble(processedScramble);
-        setIsEditMode(false);
-      }
+    if (!isError && inputValue.includes("\n")) {
+      saveScramble();
     }
-
-    const isValid = isValidScramble(inputValue);
-
-    setIsError(!isValid);
   };
+
+  const saveScramble = () => {
+    try {
+      const newScramble = convertScrambleToStandardForm(editingScramble);
+      setCurrentScramble(newScramble);
+      setIsEditMode(false);
+    } catch(err) {
+      console.log("There was an unexpected exception thrown here.")
+    }
+  }
 
   return (
     <AppBar position="relative">
@@ -55,7 +55,7 @@ const Header = ({currentScramble, setCurrentScramble}) => {
               <Typography variant="h6">
                 Scramble: {currentScramble}
                 <Box ml={1} display="inline">
-                  <ButtonBase onClick={() => setIsEditMode(true)}>
+                  <ButtonBase onClick={() => {setIsEditMode(true); setEditingScramble(currentScramble)}}>
                     <EditIcon />
                   </ButtonBase>
                 </Box>
@@ -64,19 +64,27 @@ const Header = ({currentScramble, setCurrentScramble}) => {
             {isEditMode && (
               <TextField
                 // error
-                label="Input Scramble"
+                label="Enter a custom scramble:"
                 fullWidth
                 multiline
                 onChange={e => handleTextFieldChange(e)}
-                defaultValue={currentScramble}
                 error={isError}
+                value={editingScramble}
               />
             )}
           </Box>
           <Box>
-            <Button onClick={handleNewScrambleClick} variant="contained" color="success">
-              New Scramble
-            </Button>
+            {!isEditMode && 
+              <Button onClick={handleNewScrambleClick} variant="contained" color="success">
+                New Random Scramble
+              </Button>
+            }
+            {isEditMode && 
+              <Button onClick={saveScramble} variant="contained" disabled={isError}>
+                Save
+              </Button>
+
+            }
           </Box>
 
         </Box>
@@ -84,6 +92,37 @@ const Header = ({currentScramble, setCurrentScramble}) => {
       </Toolbar>
     </AppBar>
   )
+}
+
+const convertScrambleToStandardForm = scrambleString => {
+  const validMoves = ["R", "L", "U", "D", "F", "B"];
+
+  debugger;
+
+  let scramble = scrambleString;
+  scramble = scramble.replaceAll(" ", "").replaceAll("\n", "").toUpperCase();
+
+  if (scramble === ""){
+    throw new Error();
+  }
+
+  let scrambleTokens = []
+  for (let i = 0; i < scramble.length; i ++) {
+    if (!validMoves.includes(scramble[i])) {
+      throw new Error()
+    }
+    if (scramble[i+1] === "'") {
+      scrambleTokens.push(scramble[i] + "'");
+      i ++;
+    } else if (scramble[i+1] === "2") {
+      scrambleTokens.push(scramble[i] + "2");
+      i ++;
+    } else {
+      scrambleTokens.push(scramble[i]);
+    }
+  }
+
+  return scrambleTokens.join(" ");
 }
 
 export default Header;
