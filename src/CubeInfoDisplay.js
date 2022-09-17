@@ -18,6 +18,15 @@ const CubeInfoDisplay = ({currentScramble}) => {
     buffer: 2,
   });
 
+  const twistedCorners = findTwistedCorners({
+    cubeJSON, 
+    buffer: 2,
+  });
+  const twistedEdges = findTwistedEdges({
+    cubeJSON, 
+    buffer: 5,
+  });
+
 
 
   return (
@@ -28,10 +37,17 @@ const CubeInfoDisplay = ({currentScramble}) => {
       <Typography>
         Corners: {displayAsPairs(cornerCycles)}
       </Typography>
+      <Typography>
+        Twisted Edges: {twistedEdges.join(', ')}
+      </Typography>
+      <Typography>
+        Twisted Corners: {twistedCorners.join(', ')}
+      </Typography>
     </Box>
   );
 }
 
+export default CubeInfoDisplay;
 
 const EDGE_LOCATIONS = [
   ["UR", "RU"],
@@ -267,9 +283,6 @@ const calculateCornerCycles = ({cubeJSON, buffer}) => {
   })
 }
 
-export default CubeInfoDisplay;
-
-
 const displayAsPairs = letterArray => {
   let letterString = letterArray.join('');
   let pairs = [];
@@ -278,4 +291,38 @@ const displayAsPairs = letterArray => {
     letterString = letterString.slice(2);
   }
   return pairs.join(' ');
+}
+
+const findTwistedEdges = ({cubeJSON, buffer}) => {
+  const {ep, eo} = cubeJSON;
+
+  let twistedEdges = [];
+
+  for (let i = 0; i < ep.length; i ++) {
+    if (ep[i] === i && i !== buffer) {
+      if (eo[i] !== 0) {
+        const position = ep[i];
+        const orientation = eo[i];
+        twistedEdges.push(EDGE_LOCATIONS[position][orientation]);
+      }
+    }
+  }
+  return twistedEdges;
+}
+
+const findTwistedCorners = ({cubeJSON, buffer}) => {
+  const {cp, co} = cubeJSON;
+
+  let twistedCorners = [];
+
+  for (let i = 0; i < cp.length; i ++) {
+    if (cp[i] === i && i !== buffer) {
+      if (co[i] !== 0) {
+        const position = cp[i];
+        const orientation = co[i];
+        twistedCorners.push(CORNER_LOCATIONS[position][orientation]);
+      }
+    }
+  }
+  return twistedCorners;
 }
