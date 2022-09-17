@@ -76,6 +76,12 @@ const calculateEdgeCycles = ({cubeJSON, buffer}) => {
 
   let hasTouched = ep.map((elem, index) => elem === index);
   hasTouched[buffer] = true;
+
+  const allEdgesAreSolved = !hasTouched.some(val => !val);
+  if (allEdgesAreSolved) {
+    return "";
+  }
+
   
   let cycles = [];
 
@@ -128,7 +134,6 @@ const calculateEdgeCycles = ({cubeJSON, buffer}) => {
   }
 
   return cycles.map(arr => {
-    
     const [location, orientation] = arr;
     const code = EDGE_LOCATIONS[location][orientation];
     return SPIFFS.EDGES[code];
