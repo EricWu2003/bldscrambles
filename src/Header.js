@@ -97,8 +97,6 @@ const Header = ({currentScramble, setCurrentScramble}) => {
 const convertScrambleToStandardForm = scrambleString => {
   const validMoves = ["R", "L", "U", "D", "F", "B"];
 
-  debugger;
-
   let scramble = scrambleString;
   scramble = scramble.replaceAll(" ", "").replaceAll("\n", "").toUpperCase();
 

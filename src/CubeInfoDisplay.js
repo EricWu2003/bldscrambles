@@ -8,14 +8,17 @@ const CubeInfoDisplay = ({currentScramble}) => {
 
   const cubeJSON = cube.toJSON()
 
-  const edgeCycles = calculateEdgeCycles({
-    cubeJSON, 
-    buffer: 5,
-  });
-
   const cornerCycles = calculateCornerCycles({
     cubeJSON, 
     buffer: 2,
+  });
+
+  const hasParity = cornerCycles.length % 2 === 1;
+
+  const edgeCycles = calculateEdgeCycles({
+    cubeJSON, 
+    buffer: 5,
+    adjustForParity: hasParity,
   });
 
   const twistedCorners = findTwistedCorners({
@@ -31,6 +34,9 @@ const CubeInfoDisplay = ({currentScramble}) => {
 
   return (
     <Box>
+      <Typography>
+        Has parity: {hasParity ?  "Yes": "No"}
+      </Typography>
       <Typography>
         Edges: {displayAsPairs(edgeCycles)}
       </Typography>
@@ -132,8 +138,21 @@ const SPIFFS = {
 }
 
 
-const calculateEdgeCycles = ({cubeJSON, buffer}) => {
-  const {ep, eo} = cubeJSON;
+const calculateEdgeCycles = ({cubeJSON, buffer, adjustForParity}) => {
+  let {ep, eo} = cubeJSON;
+
+  if (adjustForParity) {
+    // on cases with parity, we want to swap the locations of the UB and UR edges. These correspond to edges in position 2 and 3.
+    ep = ep.map(num => {
+      if (num === 2) {
+        return 3
+      } else if (num === 3) {
+        return 2
+      } else {
+        return num;
+      }
+    })
+  }
 
   let currentBufferLocation = ep.findIndex(x => x === buffer);
 
