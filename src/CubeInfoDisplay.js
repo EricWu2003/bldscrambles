@@ -161,7 +161,7 @@ const calculateEdgeCycles = ({cubeJSON, buffer, adjustForParity}) => {
 
   const allEdgesAreSolved = !hasTouched.some(val => !val);
   if (allEdgesAreSolved) {
-    return "";
+    return [];
   }
 
   
@@ -234,7 +234,7 @@ const calculateCornerCycles = ({cubeJSON, buffer}) => {
 
   const allEdgesAreSolved = !hasTouched.some(val => !val);
   if (allEdgesAreSolved) {
-    return "";
+    return [];
   }
 
   
