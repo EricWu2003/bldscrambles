@@ -2,8 +2,11 @@ import React from 'react';
 import { Button, AppBar, Toolbar, Typography, Box, ButtonBase, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { generateRandomScramble } from './utils';
+import { SettingsContext } from './App';
+
 
 const Header = ({currentScramble, setCurrentScramble}) => {
+  const {currentSettings, setCurrentSettings} = React.useContext(SettingsContext);
 
   const [editingScramble, setEditingScramble] = React.useState(currentScramble);
 
@@ -13,6 +16,10 @@ const Header = ({currentScramble, setCurrentScramble}) => {
 
   const handleNewScrambleClick = () => {
     setCurrentScramble(generateRandomScramble());
+    setCurrentSettings({
+      ...currentSettings,
+      lightTheme: !currentSettings.lightTheme,
+    })
   };
 
   const isValidScramble = scramble => {
